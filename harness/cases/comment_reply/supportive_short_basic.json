@@ -1,0 +1,24 @@
+{
+  "name": "supportive_short_basic",
+  "agent_name": "comment_reply",
+  "request": {
+    "source_post_text": "We just launched a lightweight analytics plugin for WordPress.",
+    "intent": "supportive",
+    "tone": "professional",
+    "length": "short",
+    "variants": 3
+  },
+  "checks": {
+    "min_comments": 3,
+    "forbid_any": [
+      "buy now",
+      "click here"
+    ],
+    "must_include_any": [
+      "great",
+      "nice",
+      "strong",
+      "love"
+    ]
+  }
+}

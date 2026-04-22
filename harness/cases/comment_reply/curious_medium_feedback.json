@@ -1,0 +1,24 @@
+{
+  "name": "curious_medium_feedback",
+  "agent_name": "comment_reply",
+  "request": {
+    "source_post_text": "Our team shipped a small feature to simplify plugin onboarding in two clicks.",
+    "intent": "curious",
+    "tone": "friendly",
+    "length": "medium",
+    "variants": 2
+  },
+  "checks": {
+    "min_comments": 2,
+    "forbid_any": [
+      "buy now",
+      "guaranteed profits"
+    ],
+    "must_include_any": [
+      "curious",
+      "wonder",
+      "nice",
+      "great"
+    ]
+  }
+}

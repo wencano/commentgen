@@ -1,0 +1,24 @@
+{
+  "name": "sample_single_reply",
+  "agent_name": "comment_reply",
+  "request": {
+    "source_post_text": "We rolled out a new onboarding update and want one thoughtful reply.",
+    "intent": "supportive",
+    "tone": "professional",
+    "length": "short",
+    "variants": 1
+  },
+  "checks": {
+    "min_comments": 1,
+    "forbid_any": [
+      "buy now",
+      "limited time offer"
+    ],
+    "must_include_any": [
+      "great",
+      "nice",
+      "strong",
+      "love"
+    ]
+  }
+}
