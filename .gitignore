@@ -1,0 +1,10 @@
+.venv/
+__pycache__/
+.pycache/
+*.pyc
+.DS_Store
+.env
+runs/*.json
+harness/report/*.json
+commentgen.db
+/commentgen.db
