@@ -1,0 +1,503 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>commentgen chat</title>
+    <style>
+      :root {
+        color-scheme: dark;
+        --bg: #141414;
+        --panel: #1f1f1f;
+        --panel-2: #262626;
+        --text: #e8e8e8;
+        --muted: #9a9a9a;
+        --accent: #6da3ff;
+        --user: #2f3f5a;
+        --assistant: #2f2f2f;
+      }
+      body {
+        margin: 0;
+        font-family: Inter, ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial;
+        background: var(--bg);
+        color: var(--text);
+      }
+      .app {
+        display: grid;
+        grid-template-columns: 280px 1fr;
+        height: 100vh;
+      }
+      .sidebar {
+        border-right: 1px solid #333;
+        background: var(--panel);
+        display: flex;
+        flex-direction: column;
+      }
+      .sidebar header {
+        padding: 14px;
+        border-bottom: 1px solid #333;
+      }
+      .sidebar-brand {
+        margin-bottom: 10px;
+      }
+      .sidebar-brand h1 {
+        margin: 0 0 4px;
+        font-size: 15px;
+        font-weight: 600;
+      }
+      .sidebar-brand a {
+        color: var(--text);
+        text-decoration: none;
+      }
+      .sidebar-brand a:hover {
+        text-decoration: underline;
+      }
+      .sidebar-brand p {
+        margin: 0;
+        font-size: 12px;
+        color: var(--muted);
+      }
+      .btn {
+        width: 100%;
+        border: 1px solid #3d3d3d;
+        background: var(--panel-2);
+        color: var(--text);
+        border-radius: 8px;
+        padding: 8px 10px;
+        cursor: pointer;
+      }
+      .sessions {
+        padding: 10px;
+        overflow: auto;
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+      }
+      .session-item {
+        border: 1px solid #3a3a3a;
+        background: #202020;
+        border-radius: 8px;
+        padding: 8px;
+        cursor: pointer;
+      }
+      .session-item.active {
+        border-color: var(--accent);
+      }
+      .session-title {
+        font-size: 13px;
+      }
+      .session-time {
+        font-size: 11px;
+        color: var(--muted);
+        margin-top: 4px;
+      }
+      .main {
+        display: block;
+      }
+      .view-hidden {
+        display: none;
+      }
+      .main header {
+        padding: 14px 18px;
+        border-bottom: 1px solid #333;
+        background: var(--panel);
+      }
+      .messages {
+        overflow: auto;
+        padding: 20px;
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+      }
+      .bubble {
+        max-width: 860px;
+        white-space: pre-wrap;
+        line-height: 1.35;
+        border-radius: 10px;
+        padding: 10px 12px;
+        border: 1px solid #3b3b3b;
+      }
+      .bubble.user { background: var(--user); align-self: flex-end; }
+      .bubble.assistant { background: var(--assistant); align-self: flex-start; }
+      .bubble small { color: var(--muted); display: block; margin-top: 6px; }
+      .composer {
+        border-top: 1px solid #333;
+        padding: 12px;
+        background: var(--panel);
+      }
+      .sidebar-actions {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 8px;
+      }
+      .secondary-btn {
+        border: 1px solid #3d3d3d;
+        background: #262626;
+        color: var(--text);
+        border-radius: 8px;
+        padding: 8px 10px;
+        cursor: pointer;
+      }
+      .compose-row {
+        display: grid;
+        grid-template-columns: 1fr auto;
+        gap: 8px;
+      }
+      .agent-status {
+        margin-bottom: 8px;
+        font-size: 12px;
+        color: #c9d6f4;
+        min-height: 16px;
+      }
+      .agent-status.error {
+        color: #ff9b9b;
+      }
+      .attachment-row {
+        margin-bottom: 8px;
+      }
+      .attachment-row label {
+        display: inline-block;
+        font-size: 12px;
+        color: var(--muted);
+        margin-bottom: 4px;
+      }
+      .attachment-row input[type="file"] {
+        width: 100%;
+        color: var(--text);
+      }
+      textarea {
+        min-height: 64px;
+        resize: vertical;
+        border-radius: 8px;
+        border: 1px solid #3d3d3d;
+        background: #1a1a1a;
+        color: var(--text);
+        padding: 10px;
+      }
+      .home-main {
+        padding: 22px;
+      }
+      .home-card {
+        max-width: 900px;
+        border: 1px solid #333;
+        border-radius: 12px;
+        background: #202020;
+        padding: 16px;
+      }
+      .home-card h2 {
+        margin: 0 0 8px;
+      }
+      .home-card p {
+        margin: 0 0 14px;
+        color: var(--muted);
+        line-height: 1.45;
+      }
+      .home-card textarea {
+        width: 100%;
+        min-height: 220px;
+        box-sizing: border-box;
+      }
+      .home-actions {
+        margin-top: 10px;
+        display: flex;
+        gap: 8px;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="app">
+      <aside class="sidebar">
+        <header>
+          <div class="sidebar-brand">
+            <h1><a href="#" id="brandHomeLink">CommentGen</a></h1>
+            <p>Agentic social comment generation and iteration.</p>
+          </div>
+          <div class="sidebar-actions">
+            <button id="homeBtn" class="secondary-btn">Home</button>
+            <button id="newSession" class="btn">+ New Comment</button>
+          </div>
+        </header>
+        <div id="sessions" class="sessions"></div>
+      </aside>
+      <main class="main">
+        <section id="homeView" class="home-main">
+          <div class="home-card">
+            <h2>Home</h2>
+            <p>
+              Draft a big prompt here, then open chat to generate one reply.
+              Sidebar remains visible so you can jump between sessions anytime.
+            </p>
+            <textarea id="homePrompt" placeholder="Describe post context, audience, and desired reply angle..."></textarea>
+            <div class="home-actions">
+              <button id="homeOpenChatBtn" class="btn" style="max-width: 220px;">Open Chat With Prompt</button>
+              <button id="homeClearBtn" class="secondary-btn">Clear</button>
+            </div>
+          </div>
+        </section>
+
+        <section id="chatView" class="view-hidden">
+          <header>
+            <strong id="sessionTitle">New chat</strong>
+          </header>
+          <section id="messages" class="messages"></section>
+          <section class="composer">
+            <div id="agentStatus" class="agent-status"></div>
+            <div class="attachment-row">
+              <label>Screenshot (optional)</label>
+              <input id="imageInput" type="file" accept="image/png,image/jpeg,image/webp" />
+            </div>
+            <div class="compose-row">
+              <textarea id="messageInput" placeholder="Type post context and generate one reply..."></textarea>
+              <button id="sendBtn" class="btn" style="width: 160px;">Generate Reply</button>
+            </div>
+          </section>
+        </section>
+      </main>
+    </div>
+
+    <script>
+      const sessionsEl = document.getElementById("sessions");
+      const homeViewEl = document.getElementById("homeView");
+      const chatViewEl = document.getElementById("chatView");
+      const homeBtn = document.getElementById("homeBtn");
+      const brandHomeLink = document.getElementById("brandHomeLink");
+      const homePromptEl = document.getElementById("homePrompt");
+      const homeOpenChatBtn = document.getElementById("homeOpenChatBtn");
+      const homeClearBtn = document.getElementById("homeClearBtn");
+      const messagesEl = document.getElementById("messages");
+      const titleEl = document.getElementById("sessionTitle");
+      const inputEl = document.getElementById("messageInput");
+      const sendBtn = document.getElementById("sendBtn");
+      const newSessionBtn = document.getElementById("newSession");
+      const imageInputEl = document.getElementById("imageInput");
+      const agentStatusEl = document.getElementById("agentStatus");
+
+      let currentSessionId = null;
+
+      function showView(view) {
+        if (view === "chat") {
+          homeViewEl.classList.add("view-hidden");
+          chatViewEl.classList.remove("view-hidden");
+        } else {
+          homeViewEl.classList.remove("view-hidden");
+          chatViewEl.classList.add("view-hidden");
+        }
+      }
+
+      async function api(path, options = {}) {
+        const res = await fetch(path, {
+          headers: { "Content-Type": "application/json" },
+          ...options,
+        });
+        if (!res.ok) throw new Error(await parseApiError(res));
+        return res.json();
+      }
+
+      function renderMessage(msg) {
+        const wrap = createBubble(msg.role, msg.content);
+        const meta = document.createElement("small");
+        meta.textContent = new Date(msg.created_at).toLocaleString();
+        wrap.appendChild(meta);
+        messagesEl.appendChild(wrap);
+      }
+
+      function createBubble(role, content) {
+        const wrap = document.createElement("div");
+        wrap.className = `bubble ${role}`;
+        wrap.textContent = content;
+        return wrap;
+      }
+
+      async function loadSessions() {
+        const sessions = await api("/api/sessions");
+        sessionsEl.innerHTML = "";
+        for (const s of sessions) {
+          const item = document.createElement("div");
+          item.className = "session-item" + (s.session_id === currentSessionId ? " active" : "");
+          item.innerHTML = `
+            <div class="session-title">${s.title}</div>
+            <div class="session-time">${new Date(s.updated_at).toLocaleString()}</div>
+          `;
+          item.onclick = async () => {
+            currentSessionId = s.session_id;
+            await loadSession(currentSessionId);
+            await loadSessions();
+          };
+          sessionsEl.appendChild(item);
+        }
+      }
+
+      async function loadSession(sessionId) {
+        const data = await api(`/api/sessions/${sessionId}`);
+        showView("chat");
+        titleEl.textContent = data.title;
+        messagesEl.innerHTML = "";
+        for (const msg of data.messages) renderMessage(msg);
+        messagesEl.scrollTop = messagesEl.scrollHeight;
+      }
+
+      async function createSession() {
+        const data = await api("/api/sessions", { method: "POST", body: JSON.stringify({ first_message: "" }) });
+        currentSessionId = data.session_id;
+        await loadSession(currentSessionId);
+        await loadSessions();
+      }
+
+      async function sendIterate() {
+        if (!currentSessionId) await createSession();
+        const message = inputEl.value.trim();
+        const file = imageInputEl.files[0];
+        if (!message && !file) return;
+
+        const optimisticUserText = buildOptimisticUserText(message, !!file);
+        renderMessage({ role: "user", content: optimisticUserText, created_at: new Date().toISOString() });
+        messagesEl.scrollTop = messagesEl.scrollHeight;
+
+        inputEl.value = "";
+        imageInputEl.value = "";
+
+        sendBtn.disabled = true;
+        agentStatusEl.classList.remove("error");
+        agentStatusEl.textContent = "Running agent: preparing request...";
+        try {
+          const imageDataUrl = file ? await fileToDataUrl(file) : null;
+          const payload = { message, image_data_url: imageDataUrl };
+          const streamRes = await fetch(`/api/sessions/${currentSessionId}/iterate/stream`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(payload),
+          });
+          if (!streamRes.ok || !streamRes.body) {
+            throw new Error(await parseApiError(streamRes));
+          }
+
+          const liveBubble = createBubble("assistant", "");
+          messagesEl.appendChild(liveBubble);
+          messagesEl.scrollTop = messagesEl.scrollHeight;
+
+          const reader = streamRes.body.getReader();
+          const decoder = new TextDecoder();
+          let buffer = "";
+          let donePayload = null;
+
+          while (true) {
+            const { value, done } = await reader.read();
+            if (done) break;
+            buffer += decoder.decode(value, { stream: true });
+            const parts = buffer.split("\n\n");
+            buffer = parts.pop() || "";
+
+            for (const block of parts) {
+              const lines = block.split("\n");
+              let eventName = "message";
+              let dataText = "";
+              for (const line of lines) {
+                if (line.startsWith("event:")) eventName = line.slice(6).trim();
+                if (line.startsWith("data:")) dataText += line.slice(5).trim();
+              }
+              if (!dataText) continue;
+              const data = JSON.parse(dataText);
+
+              if (eventName === "status") {
+                agentStatusEl.textContent = `Running agent: ${data.agent}`;
+              } else if (eventName === "chunk") {
+                liveBubble.textContent = data.text || "";
+                messagesEl.scrollTop = messagesEl.scrollHeight;
+              } else if (eventName === "done") {
+                donePayload = data;
+              } else if (eventName === "error") {
+                throw new Error(data.message || "Streaming error");
+              }
+            }
+          }
+
+          const res = donePayload || {};
+          if (res.title) titleEl.textContent = res.title;
+          agentStatusEl.textContent = "";
+          await loadSession(currentSessionId);
+          await loadSessions();
+        } catch (err) {
+          const msg = err instanceof Error ? err.message : "Request failed.";
+          agentStatusEl.classList.add("error");
+          agentStatusEl.textContent = msg;
+        } finally {
+          sendBtn.disabled = false;
+          if (agentStatusEl.textContent.startsWith("Running agent:")) {
+            agentStatusEl.textContent = "";
+          }
+        }
+      }
+
+      function fileToDataUrl(file) {
+        return new Promise((resolve, reject) => {
+          const reader = new FileReader();
+          reader.onload = () => resolve(reader.result);
+          reader.onerror = reject;
+          reader.readAsDataURL(file);
+        });
+      }
+
+      function buildOptimisticUserText(message, hasImage) {
+        const text = (message || "").trim();
+        if (text && hasImage) return `${text}\n\n[Image attached]`;
+        if (text) return text;
+        if (hasImage) return "[Image attached]";
+        return "";
+      }
+
+      async function parseApiError(response) {
+        const raw = await response.text();
+        try {
+          const parsed = JSON.parse(raw);
+          if (parsed && typeof parsed.detail === "string" && parsed.detail.trim()) {
+            return parsed.detail;
+          }
+        } catch (_) {}
+        return raw || `HTTP ${response.status}`;
+      }
+
+      sendBtn.onclick = sendIterate;
+      newSessionBtn.onclick = createSession;
+      homeBtn.onclick = () => showView("home");
+      brandHomeLink.onclick = (e) => {
+        e.preventDefault();
+        showView("home");
+      };
+      homeClearBtn.onclick = () => {
+        homePromptEl.value = "";
+      };
+      homeOpenChatBtn.onclick = async () => {
+        const prompt = homePromptEl.value.trim();
+        if (!currentSessionId) {
+          await createSession();
+        } else {
+          showView("chat");
+        }
+        inputEl.value = prompt;
+        inputEl.focus();
+      };
+
+      inputEl.addEventListener("keydown", (e) => {
+        if (e.key === "Enter" && !e.shiftKey) {
+          e.preventDefault();
+          sendIterate();
+        }
+      });
+
+      (async () => {
+        const initialPath = window.location.pathname;
+        showView(initialPath === "/chat" ? "chat" : "home");
+        const sessions = await api("/api/sessions");
+        if (sessions.length > 0) {
+          currentSessionId = sessions[0].session_id;
+          if (initialPath === "/chat") {
+            await loadSession(currentSessionId);
+          }
+        } else if (initialPath === "/chat") {
+          await createSession();
+        }
+        await loadSessions();
+      })();
+    </script>
+  </body>
+</html>

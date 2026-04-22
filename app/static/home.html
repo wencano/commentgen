@@ -1,0 +1,132 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>CommentGen Home</title>
+    <style>
+      :root {
+        color-scheme: dark;
+        --bg: #141414;
+        --panel: #1f1f1f;
+        --text: #e8e8e8;
+        --muted: #a0a0a0;
+        --accent: #6da3ff;
+      }
+      body {
+        margin: 0;
+        font-family: Inter, ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial;
+        background: var(--bg);
+        color: var(--text);
+      }
+      .wrap {
+        max-width: 920px;
+        margin: 0 auto;
+        padding: 40px 20px 60px;
+      }
+      .logo {
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        color: var(--text);
+        text-decoration: none;
+        margin-bottom: 24px;
+      }
+      .logo-mark {
+        width: 30px;
+        height: 30px;
+        border-radius: 8px;
+        background: linear-gradient(135deg, #6da3ff, #83e3ff);
+      }
+      .logo span {
+        font-weight: 700;
+        letter-spacing: 0.2px;
+      }
+      h1 {
+        margin: 0 0 8px;
+        font-size: 34px;
+      }
+      p {
+        margin: 0 0 24px;
+        color: var(--muted);
+        line-height: 1.5;
+      }
+      .card {
+        background: var(--panel);
+        border: 1px solid #333;
+        border-radius: 12px;
+        padding: 16px;
+      }
+      label {
+        display: block;
+        font-size: 13px;
+        color: var(--muted);
+        margin-bottom: 8px;
+      }
+      textarea {
+        width: 100%;
+        min-height: 220px;
+        resize: vertical;
+        border-radius: 10px;
+        border: 1px solid #3d3d3d;
+        background: #1a1a1a;
+        color: var(--text);
+        padding: 12px;
+        box-sizing: border-box;
+      }
+      .actions {
+        display: flex;
+        gap: 10px;
+        margin-top: 12px;
+      }
+      button, a.btn {
+        border: 1px solid #3d3d3d;
+        background: #252525;
+        color: var(--text);
+        border-radius: 8px;
+        padding: 10px 14px;
+        cursor: pointer;
+        text-decoration: none;
+        display: inline-block;
+      }
+      .primary {
+        background: #2f4f86;
+        border-color: #4c6ba3;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="wrap">
+      <a class="logo" href="/chat" title="Open CommentGen chat">
+        <div class="logo-mark"></div>
+        <span>CommentGen</span>
+      </a>
+
+      <h1>Agentic comment generation</h1>
+      <p>
+        Create one clear social-media reply from your text prompt or screenshot context.
+        Start with a detailed prompt below, then open chat to generate and iterate quickly.
+      </p>
+
+      <div class="card">
+        <label for="prompt">Big prompt</label>
+        <textarea id="prompt" placeholder="Describe the post context, audience, and desired reply angle..."></textarea>
+        <div class="actions">
+          <button id="openChat" class="primary">Open Chat With Prompt</button>
+          <a class="btn" href="/chat">Open Empty Chat</a>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      const promptEl = document.getElementById("prompt");
+      const openChatBtn = document.getElementById("openChat");
+
+      openChatBtn.addEventListener("click", () => {
+        const text = promptEl.value.trim();
+        localStorage.setItem("commentgen_home_prompt", text);
+        window.location.href = "/chat";
+      });
+    </script>
+  </body>
+  </html>
