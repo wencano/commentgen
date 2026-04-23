@@ -3,254 +3,779 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>commentgen chat</title>
+    <title>CommentGen</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Source+Serif+4:opsz,wght@8..60,400;8..60,500;8..60,600&family=Inter:wght@400;500;600&display=swap"
+      rel="stylesheet"
+    />
     <style>
       :root {
-        color-scheme: dark;
-        --bg: #141414;
-        --panel: #1f1f1f;
-        --panel-2: #262626;
-        --text: #e8e8e8;
-        --muted: #9a9a9a;
-        --accent: #6da3ff;
-        --user: #2f3f5a;
-        --assistant: #2f2f2f;
+        color-scheme: light;
+        --bg: #faf9f5;
+        --sidebar-bg: #f5f1e8;
+        --sidebar-hover: #ece5d6;
+        --card: #ffffff;
+        --border: #e8e2d5;
+        --border-strong: #ddd4be;
+        --text: #2b2824;
+        --text-soft: #4c4842;
+        --muted: #8a857d;
+        --user-bubble: #f2e9d7;
+        --accent: #c15f3c;
+        --accent-soft: #e8b8a5;
+        --ring: rgba(193, 95, 60, 0.22);
+        --shadow-sm: 0 1px 2px rgba(60, 45, 25, 0.04);
+        --shadow-md: 0 8px 24px -12px rgba(60, 45, 25, 0.18);
+        --font-ui: "Inter", ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        --font-serif: "Source Serif 4", ui-serif, Georgia, "Cambria", "Times New Roman", serif;
       }
+      * { box-sizing: border-box; }
+      html, body { height: 100%; }
       body {
         margin: 0;
-        font-family: Inter, ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial;
+        font-family: var(--font-ui);
+        font-size: 14px;
         background: var(--bg);
         color: var(--text);
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
       }
+      button { font-family: inherit; }
+      textarea { font-family: inherit; }
+
       .app {
         display: grid;
-        grid-template-columns: 280px 1fr;
+        grid-template-columns: 260px 1fr;
         height: 100vh;
       }
+
+      /* ---------- Sidebar ---------- */
       .sidebar {
-        border-right: 1px solid #333;
-        background: var(--panel);
+        background: var(--sidebar-bg);
+        border-right: 1px solid var(--border);
         display: flex;
         flex-direction: column;
-      }
-      .sidebar header {
-        padding: 14px;
-        border-bottom: 1px solid #333;
+        min-width: 0;
       }
       .sidebar-brand {
-        margin-bottom: 10px;
-      }
-      .sidebar-brand h1 {
-        margin: 0 0 4px;
-        font-size: 15px;
-        font-weight: 600;
-      }
-      .sidebar-brand a {
-        color: var(--text);
-        text-decoration: none;
-      }
-      .sidebar-brand a:hover {
-        text-decoration: underline;
-      }
-      .sidebar-brand p {
-        margin: 0;
-        font-size: 12px;
-        color: var(--muted);
-      }
-      .btn {
-        width: 100%;
-        border: 1px solid #3d3d3d;
-        background: var(--panel-2);
-        color: var(--text);
-        border-radius: 8px;
-        padding: 8px 10px;
-        cursor: pointer;
-      }
-      .sessions {
-        padding: 10px;
-        overflow: auto;
         display: flex;
-        flex-direction: column;
+        align-items: center;
         gap: 8px;
+        padding: 14px 16px 4px;
       }
-      .session-item {
-        border: 1px solid #3a3a3a;
-        background: #202020;
-        border-radius: 8px;
-        padding: 8px;
-        cursor: pointer;
-      }
-      .session-item.active {
-        border-color: var(--accent);
-      }
-      .session-title {
-        font-size: 13px;
-      }
-      .session-time {
-        font-size: 11px;
-        color: var(--muted);
-        margin-top: 4px;
-      }
-      .main {
-        display: block;
-      }
-      .view-hidden {
-        display: none;
-      }
-      .main header {
-        padding: 14px 18px;
-        border-bottom: 1px solid #333;
-        background: var(--panel);
-      }
-      .messages {
-        overflow: auto;
-        padding: 20px;
-        display: flex;
-        flex-direction: column;
-        gap: 10px;
-      }
-      .bubble {
-        max-width: 860px;
-        white-space: pre-wrap;
-        line-height: 1.35;
-        border-radius: 10px;
-        padding: 10px 12px;
-        border: 1px solid #3b3b3b;
-      }
-      .bubble.user { background: var(--user); align-self: flex-end; }
-      .bubble.assistant { background: var(--assistant); align-self: flex-start; }
-      .bubble small { color: var(--muted); display: block; margin-top: 6px; }
-      .composer {
-        border-top: 1px solid #333;
-        padding: 12px;
-        background: var(--panel);
-      }
-      .sidebar-actions {
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        gap: 8px;
-      }
-      .secondary-btn {
-        border: 1px solid #3d3d3d;
-        background: #262626;
-        color: var(--text);
-        border-radius: 8px;
-        padding: 8px 10px;
-        cursor: pointer;
-      }
-      .compose-row {
-        display: grid;
-        grid-template-columns: 1fr auto;
-        gap: 8px;
-      }
-      .agent-status {
-        margin-bottom: 8px;
+      .brand-tagline {
+        margin: 0 16px 10px;
         font-size: 12px;
-        color: #c9d6f4;
-        min-height: 16px;
-      }
-      .agent-status.error {
-        color: #ff9b9b;
-      }
-      .attachment-row {
-        margin-bottom: 8px;
-      }
-      .attachment-row label {
-        display: inline-block;
-        font-size: 12px;
-        color: var(--muted);
-        margin-bottom: 4px;
-      }
-      .attachment-row input[type="file"] {
-        width: 100%;
-        color: var(--text);
-      }
-      textarea {
-        min-height: 64px;
-        resize: vertical;
-        border-radius: 8px;
-        border: 1px solid #3d3d3d;
-        background: #1a1a1a;
-        color: var(--text);
-        padding: 10px;
-      }
-      .home-main {
-        padding: 22px;
-      }
-      .home-card {
-        max-width: 900px;
-        border: 1px solid #333;
-        border-radius: 12px;
-        background: #202020;
-        padding: 16px;
-      }
-      .home-card h2 {
-        margin: 0 0 8px;
-      }
-      .home-card p {
-        margin: 0 0 14px;
         color: var(--muted);
         line-height: 1.45;
       }
+      .brand-link {
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+        margin-top: 4px;
+        color: var(--text-soft);
+        text-decoration: none;
+        font-size: 11.5px;
+      }
+      .brand-link:hover { color: var(--accent); }
+      .brand-mark {
+        width: 22px; height: 22px;
+        display: inline-flex; align-items: center; justify-content: center;
+        color: var(--accent);
+      }
+      .brand-name {
+        font-family: var(--font-serif);
+        font-size: 18px;
+        font-weight: 600;
+        letter-spacing: -0.01em;
+        color: var(--text);
+        text-decoration: none;
+      }
+
+      .nav {
+        padding: 6px 8px 4px;
+        display: flex;
+        flex-direction: column;
+        gap: 1px;
+      }
+      .nav-item {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 7px 10px;
+        border-radius: 8px;
+        color: var(--text-soft);
+        cursor: pointer;
+        font-size: 13.5px;
+        border: 1px solid transparent;
+        background: transparent;
+        text-align: left;
+        width: 100%;
+      }
+      .nav-item:hover { background: var(--sidebar-hover); color: var(--text); }
+      .nav-item .ico { width: 16px; height: 16px; flex: 0 0 16px; color: currentColor; opacity: 0.75; }
+      .nav-item.primary { color: var(--text); }
+      .nav-item .badge {
+        margin-left: auto;
+        font-size: 11px;
+        padding: 2px 6px;
+        border-radius: 999px;
+        background: #2b2824;
+        color: #faf9f5;
+        letter-spacing: 0.02em;
+      }
+
+      .sidebar-divider {
+        height: 1px;
+        background: var(--border);
+        margin: 10px 12px;
+      }
+      .section-label {
+        padding: 6px 14px 4px;
+        font-size: 11.5px;
+        color: var(--muted);
+        letter-spacing: 0.04em;
+      }
+
+      .sessions {
+        padding: 2px 8px 10px;
+        overflow: auto;
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        gap: 1px;
+      }
+      .session-item {
+        padding: 7px 10px;
+        border-radius: 8px;
+        cursor: pointer;
+        color: var(--text-soft);
+        font-size: 13px;
+        line-height: 1.25;
+        display: flex;
+        flex-direction: column;
+        gap: 2px;
+        border: 1px solid transparent;
+      }
+      .session-item:hover { background: var(--sidebar-hover); color: var(--text); }
+      .session-item.active {
+        background: #ece5d6;
+        color: var(--text);
+      }
+      .session-title {
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+      .session-time {
+        display: none;
+      }
+
+      .user-pill {
+        margin: 10px;
+        padding: 8px 10px;
+        border-radius: 10px;
+        background: transparent;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        border: 1px solid transparent;
+      }
+      .user-pill:hover { background: var(--sidebar-hover); }
+      .avatar {
+        width: 26px; height: 26px;
+        border-radius: 999px;
+        background: #2b2824;
+        color: #faf9f5;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 12px;
+        font-weight: 600;
+        letter-spacing: 0.02em;
+      }
+      .user-info { line-height: 1.15; min-width: 0; }
+      .user-name { font-size: 13px; color: var(--text); }
+      .user-plan { font-size: 11px; color: var(--muted); }
+      .user-action {
+        margin-left: auto;
+        width: 26px; height: 26px;
+        border-radius: 8px;
+        display: inline-flex; align-items: center; justify-content: center;
+        background: transparent;
+        border: 1px solid transparent;
+        color: var(--text-soft);
+        cursor: pointer;
+      }
+      .user-action:hover { background: #ddd4be; }
+
+      /* ---------- Main ---------- */
+      .main {
+        display: flex;
+        flex-direction: column;
+        min-width: 0;
+        min-height: 0;
+        background: var(--bg);
+      }
+      .view-hidden { display: none !important; }
+
+      .topbar {
+        height: 52px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 0 18px;
+        border-bottom: 1px solid transparent;
+      }
+      .breadcrumb {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 6px 10px;
+        border-radius: 8px;
+        color: var(--text);
+        font-size: 13.5px;
+        cursor: pointer;
+      }
+      .breadcrumb:hover { background: var(--sidebar-hover); }
+      .breadcrumb .chev { opacity: 0.6; }
+      .share-btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 6px 12px;
+        border: 1px solid var(--border-strong);
+        background: var(--card);
+        border-radius: 8px;
+        font-size: 13px;
+        color: var(--text);
+        cursor: pointer;
+        box-shadow: var(--shadow-sm);
+      }
+      .share-btn:hover { background: #fffdf5; }
+
+      /* ---------- Messages ---------- */
+      .messages {
+        flex: 1;
+        overflow: auto;
+        padding: 18px 18px 0;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+      }
+      .thread {
+        width: 100%;
+        max-width: 760px;
+        display: flex;
+        flex-direction: column;
+        gap: 22px;
+        padding-bottom: 18px;
+      }
+      .msg { display: flex; flex-direction: column; gap: 6px; }
+      .msg.user { align-items: flex-end; }
+      .msg.assistant { align-items: stretch; }
+
+      .bubble {
+        white-space: pre-wrap;
+        line-height: 1.6;
+        font-size: 15px;
+        color: var(--text);
+      }
+      .msg.user .bubble {
+        background: var(--user-bubble);
+        padding: 10px 14px;
+        border-radius: 16px;
+        max-width: 85%;
+      }
+      .msg.assistant .bubble {
+        font-family: var(--font-serif);
+        font-size: 16px;
+        line-height: 1.7;
+        letter-spacing: -0.001em;
+        color: var(--text);
+      }
+      .msg small.meta {
+        color: var(--muted);
+        font-size: 11.5px;
+      }
+      .msg-actions {
+        display: flex;
+        gap: 4px;
+        color: var(--muted);
+      }
+      .msg.assistant .msg-actions { padding-left: 2px; }
+      .msg.user .msg-actions { justify-content: flex-end; }
+      .icon-btn {
+        width: 28px; height: 28px;
+        display: inline-flex; align-items: center; justify-content: center;
+        border-radius: 6px;
+        border: 1px solid transparent;
+        background: transparent;
+        color: currentColor;
+        cursor: pointer;
+      }
+      .icon-btn:hover { background: var(--sidebar-hover); color: var(--text); }
+
+      /* ---------- Agent flow ---------- */
+      .agent-flow {
+        align-self: stretch;
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+        padding: 10px 12px;
+        border: 1px solid var(--border);
+        border-radius: 12px;
+        background: #fbf8ef;
+        font-size: 12.5px;
+        color: var(--text-soft);
+      }
+      .agent-flow-head {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        font-size: 11px;
+        color: var(--muted);
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+      }
+      .agent-flow-head .dot {
+        width: 6px; height: 6px; border-radius: 999px;
+        background: var(--accent);
+      }
+      .agent-step {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 2px 0;
+      }
+      .agent-step .state {
+        width: 14px; height: 14px;
+        border-radius: 999px;
+        border: 1.5px solid var(--border-strong);
+        background: transparent;
+        flex: 0 0 14px;
+        position: relative;
+      }
+      .agent-step[data-state="running"] .state {
+        border-color: var(--accent);
+        border-top-color: transparent;
+        animation: spin 0.8s linear infinite;
+      }
+      .agent-step[data-state="done"] .state {
+        border-color: #2f7d4f;
+        background: #2f7d4f;
+      }
+      .agent-step[data-state="done"] .state::after {
+        content: "";
+        position: absolute;
+        left: 3px; top: 1px;
+        width: 4px; height: 7px;
+        border: solid #fff;
+        border-width: 0 2px 2px 0;
+        transform: rotate(45deg);
+      }
+      .agent-step[data-state="error"] .state {
+        border-color: #b84535;
+        background: #b84535;
+      }
+      .agent-step .label {
+        display: inline-flex;
+        align-items: baseline;
+        gap: 6px;
+      }
+      .agent-step .tag {
+        font-size: 10.5px;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        color: var(--muted);
+      }
+      .agent-step .name {
+        font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+        font-size: 12.5px;
+        color: var(--text);
+      }
+      .agent-step .msg-text {
+        color: var(--muted);
+        margin-left: 2px;
+      }
+      @keyframes spin { to { transform: rotate(360deg); } }
+
+      /* ---------- Composer ---------- */
+      .composer-wrap {
+        padding: 10px 18px 18px;
+        display: flex;
+        justify-content: center;
+      }
+      .composer {
+        width: 100%;
+        max-width: 760px;
+        background: var(--card);
+        border: 1px solid var(--border-strong);
+        border-radius: 20px;
+        padding: 10px 12px 8px;
+        box-shadow: var(--shadow-md);
+      }
+      .composer:focus-within {
+        border-color: var(--accent-soft);
+        box-shadow: 0 0 0 4px var(--ring), var(--shadow-md);
+      }
+      .composer textarea {
+        width: 100%;
+        border: 0;
+        outline: 0;
+        background: transparent;
+        color: var(--text);
+        resize: none;
+        min-height: 28px;
+        max-height: 240px;
+        padding: 8px 6px;
+        font-size: 15px;
+        line-height: 1.5;
+      }
+      .composer textarea::placeholder { color: var(--muted); }
+      .composer-bar {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        padding: 4px 2px 2px;
+      }
+      .composer-left { display: flex; align-items: center; gap: 4px; }
+      .composer-right { margin-left: auto; display: flex; align-items: center; gap: 6px; }
+      .chip {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 5px 10px;
+        border-radius: 999px;
+        border: 1px solid var(--border-strong);
+        background: var(--card);
+        color: var(--text-soft);
+        font-size: 12.5px;
+        cursor: pointer;
+      }
+      .chip:hover { background: #fffdf5; color: var(--text); }
+      .chip.model { padding-right: 8px; }
+      .round-btn {
+        width: 32px; height: 32px;
+        border-radius: 999px;
+        border: 1px solid var(--border-strong);
+        background: var(--card);
+        color: var(--text-soft);
+        cursor: pointer;
+        display: inline-flex; align-items: center; justify-content: center;
+      }
+      .round-btn:hover { background: #fffdf5; color: var(--text); }
+      .round-btn.primary {
+        background: var(--accent);
+        border-color: var(--accent);
+        color: #fff;
+      }
+      .round-btn.primary:hover { background: #a94f2f; border-color: #a94f2f; color: #fff; }
+      .round-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+      .attachment-chip {
+        margin: 0 0 6px 4px;
+        display: none;
+        align-items: center;
+        gap: 8px;
+        font-size: 12px;
+        color: var(--text-soft);
+        background: var(--sidebar-bg);
+        border: 1px solid var(--border);
+        border-radius: 999px;
+        padding: 4px 10px;
+        width: fit-content;
+      }
+      .attachment-chip.visible { display: inline-flex; }
+      .attachment-chip button {
+        background: transparent; border: 0; color: var(--muted); cursor: pointer; padding: 0; line-height: 1;
+      }
+      .attachment-chip button:hover { color: var(--text); }
+
+      .agent-status {
+        display: flex;
+        justify-content: center;
+        color: var(--muted);
+        font-size: 12px;
+        min-height: 16px;
+        margin: 0 0 6px;
+      }
+      .agent-status.error { color: #b84535; }
+
+      .footer-note {
+        text-align: center;
+        color: var(--muted);
+        font-size: 11.5px;
+        padding: 0 18px 14px;
+      }
+
+      /* ---------- Home view ---------- */
+      .home-main {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        padding: 24px;
+      }
+      .home-inner {
+        width: 100%;
+        max-width: 760px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+      }
+      .greeting {
+        font-family: var(--font-serif);
+        font-size: 34px;
+        font-weight: 500;
+        letter-spacing: -0.02em;
+        color: var(--text);
+        margin: 0 0 24px;
+        text-align: center;
+      }
+      .greeting .star {
+        color: var(--accent);
+        margin-right: 10px;
+        display: inline-block;
+        transform: translateY(2px);
+      }
+      .greeting-sub {
+        max-width: 560px;
+        margin: -12px auto 14px;
+        text-align: center;
+        color: var(--muted);
+        font-size: 14px;
+        line-height: 1.55;
+      }
+      .flow-diagram {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        flex-wrap: wrap;
+        margin: 0 auto 26px;
+        font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+        font-size: 12px;
+      }
+      .flow-node {
+        display: inline-flex;
+        align-items: center;
+        padding: 4px 10px;
+        border-radius: 999px;
+        border: 1px solid var(--border-strong);
+        background: var(--card);
+        color: var(--text-soft);
+      }
+      .flow-arrow {
+        color: var(--muted);
+        font-weight: 600;
+      }
+      .home-card {
+        width: 100%;
+        background: var(--card);
+        border: 1px solid var(--border-strong);
+        border-radius: 20px;
+        padding: 10px 12px 8px;
+        box-shadow: var(--shadow-md);
+      }
+      .home-card:focus-within {
+        border-color: var(--accent-soft);
+        box-shadow: 0 0 0 4px var(--ring), var(--shadow-md);
+      }
       .home-card textarea {
         width: 100%;
-        min-height: 220px;
-        box-sizing: border-box;
+        border: 0;
+        outline: 0;
+        background: transparent;
+        color: var(--text);
+        resize: none;
+        min-height: 72px;
+        max-height: 320px;
+        padding: 10px 6px;
+        font-size: 15.5px;
+        line-height: 1.55;
       }
-      .home-actions {
-        margin-top: 10px;
-        display: flex;
-        gap: 8px;
+      .home-card textarea::placeholder { color: var(--muted); }
+      .home-hint {
+        margin-top: 14px;
+        color: var(--muted);
+        font-size: 12.5px;
+        text-align: center;
+      }
+      .home-hint-sep {
+        margin: 0 8px;
+        color: var(--border-strong);
+      }
+      .home-link {
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+        color: var(--text-soft);
+        text-decoration: none;
+      }
+      .home-link:hover { color: var(--accent); }
+
+      /* ---------- Scrollbars ---------- */
+      .messages::-webkit-scrollbar,
+      .sessions::-webkit-scrollbar { width: 10px; }
+      .messages::-webkit-scrollbar-thumb,
+      .sessions::-webkit-scrollbar-thumb {
+        background: #e2dbcb; border-radius: 999px;
+      }
+      .messages::-webkit-scrollbar-thumb:hover,
+      .sessions::-webkit-scrollbar-thumb:hover { background: #d6cdb8; }
+
+      /* ---------- Tiny responsive polish ---------- */
+      @media (max-width: 820px) {
+        .app { grid-template-columns: 220px 1fr; }
+      }
+      @media (max-width: 640px) {
+        .app { grid-template-columns: 1fr; }
+        .sidebar { display: none; }
       }
     </style>
   </head>
   <body>
     <div class="app">
+      <!-- Sidebar -->
       <aside class="sidebar">
-        <header>
-          <div class="sidebar-brand">
-            <h1><a href="#" id="brandHomeLink">CommentGen</a></h1>
-            <p>Agentic social comment generation and iteration.</p>
+        <div class="sidebar-brand">
+          <span class="brand-mark" aria-hidden="true">
+            <!-- Claude-style star -->
+            <svg viewBox="0 0 24 24" width="22" height="22" fill="currentColor">
+              <path d="M12 2c.4 3.6 1.8 5 5.4 5.4-3.6.4-5 1.8-5.4 5.4-.4-3.6-1.8-5-5.4-5.4C10.2 7 11.6 5.6 12 2zm7 10c.25 2.25 1.1 3.1 3.35 3.35-2.25.25-3.1 1.1-3.35 3.35-.25-2.25-1.1-3.1-3.35-3.35C17.9 15.1 18.75 14.25 19 12zM6 13c.2 1.8.9 2.5 2.7 2.7-1.8.2-2.5.9-2.7 2.7-.2-1.8-.9-2.5-2.7-2.7C5.1 15.5 5.8 14.8 6 13z"/>
+            </svg>
+          </span>
+          <a href="#" id="brandHomeLink" class="brand-name">CommentGen</a>
+        </div>
+        <p class="brand-tagline">
+          Agentic comment generator for social posts.
+          <a class="brand-link" href="https://github.com/wencano/commentgen" target="_blank" rel="noopener">
+            <svg viewBox="0 0 16 16" width="12" height="12" fill="currentColor" aria-hidden="true"><path d="M8 0C3.58 0 0 3.58 0 8a8 8 0 0 0 5.47 7.59c.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27s1.36.09 2 .27c1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0 0 16 8c0-4.42-3.58-8-8-8z"/></svg>
+            GitHub
+          </a>
+        </p>
+
+        <nav class="nav" aria-label="Primary">
+          <button id="homeBtn" class="nav-item" type="button">
+            <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11 12 4l9 7"/><path d="M5 10v9a1 1 0 0 0 1 1h4v-6h4v6h4a1 1 0 0 0 1-1v-9"/></svg>
+            Home
+          </button>
+          <button id="newSession" class="nav-item primary" type="button">
+            <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"/></svg>
+            New chat
+          </button>
+        </nav>
+
+        <div class="sidebar-divider"></div>
+        <div class="section-label">Recents</div>
+        <div id="sessions" class="sessions" role="list"></div>
+
+        <div class="user-pill">
+          <span class="avatar" aria-hidden="true">W</span>
+          <div class="user-info">
+            <div class="user-name">You</div>
+            <div class="user-plan">Free plan</div>
           </div>
-          <div class="sidebar-actions">
-            <button id="homeBtn" class="secondary-btn">Home</button>
-            <button id="newSession" class="btn">+ New Comment</button>
-          </div>
-        </header>
-        <div id="sessions" class="sessions"></div>
+          <button class="user-action" type="button" aria-label="Account">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14"/><path d="m19 12-7 7-7-7"/></svg>
+          </button>
+        </div>
       </aside>
+
+      <!-- Main -->
       <main class="main">
+        <!-- Home view -->
         <section id="homeView" class="home-main">
-          <div class="home-card">
-            <h2>Home</h2>
-            <p>
-              Draft a big prompt here, then open chat to generate one reply.
-              Sidebar remains visible so you can jump between sessions anytime.
-            </p>
-            <textarea id="homePrompt" placeholder="Describe post context, audience, and desired reply angle..."></textarea>
-            <div class="home-actions">
-              <button id="homeOpenChatBtn" class="btn" style="max-width: 220px;">Open Chat With Prompt</button>
-              <button id="homeClearBtn" class="secondary-btn">Clear</button>
+          <div class="home-inner">
+            <h1 class="greeting">
+              <span class="star" aria-hidden="true">
+                <svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor">
+                  <path d="M12 2c.4 3.6 1.8 5 5.4 5.4-3.6.4-5 1.8-5.4 5.4-.4-3.6-1.8-5-5.4-5.4C10.2 7 11.6 5.6 12 2zm7 10c.25 2.25 1.1 3.1 3.35 3.35-2.25.25-3.1 1.1-3.35 3.35-.25-2.25-1.1-3.1-3.35-3.35C17.9 15.1 18.75 14.25 19 12zM6 13c.2 1.8.9 2.5 2.7 2.7-1.8.2-2.5.9-2.7 2.7-.2-1.8-.9-2.5-2.7-2.7C5.1 15.5 5.8 14.8 6 13z"/>
+                </svg>
+              </span>
+              What comment shall we craft?
+            </h1>
+            <p class="greeting-sub">Agentic comment generation for social posts. Paste the post, add context, and let the agent draft and iterate a reply that fits.</p>
+            <div class="flow-diagram" aria-label="Agent pipeline">
+              <span class="flow-node">image_reader</span>
+              <span class="flow-arrow">&gt;</span>
+              <span class="flow-node">session_title</span>
+              <span class="flow-arrow">&gt;</span>
+              <span class="flow-node">comment_reply</span>
+            </div>
+            <div class="home-card">
+              <textarea id="homePrompt" placeholder="Paste the post, describe the audience, and the reply angle you want..."></textarea>
+              <div class="composer-bar">
+                <div class="composer-left">
+                  <button class="round-btn" id="homeClearBtn" type="button" aria-label="Clear">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18M6 6l12 12"/></svg>
+                  </button>
+                </div>
+                <div class="composer-right">
+                  <button id="homeOpenChatBtn" class="round-btn primary" type="button" aria-label="Open chat">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19V5"/><path d="m5 12 7-7 7 7"/></svg>
+                  </button>
+                </div>
+              </div>
+            </div>
+            <div class="home-hint">
+              Agents draft, review, and iterate. Always double-check before posting.
+              <span class="home-hint-sep" aria-hidden="true">·</span>
+              <a class="home-link" href="https://github.com/wencano/commentgen" target="_blank" rel="noopener">
+                <svg viewBox="0 0 16 16" width="12" height="12" fill="currentColor" aria-hidden="true"><path d="M8 0C3.58 0 0 3.58 0 8a8 8 0 0 0 5.47 7.59c.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27s1.36.09 2 .27c1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0 0 16 8c0-4.42-3.58-8-8-8z"/></svg>
+                View on GitHub
+              </a>
             </div>
           </div>
         </section>
 
-        <section id="chatView" class="view-hidden">
-          <header>
-            <strong id="sessionTitle">New chat</strong>
+        <!-- Chat view -->
+        <section id="chatView" class="view-hidden" style="display:flex; flex-direction:column; flex:1; min-height:0;">
+          <header class="topbar">
+            <button class="breadcrumb" type="button">
+              <span id="sessionTitle">New chat</span>
+              <svg class="chev" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>
+            </button>
+            <button class="share-btn" type="button">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12v7a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-7"/><path d="m16 6-4-4-4 4"/><path d="M12 2v14"/></svg>
+              Share
+            </button>
           </header>
-          <section id="messages" class="messages"></section>
-          <section class="composer">
-            <div id="agentStatus" class="agent-status"></div>
-            <div class="attachment-row">
-              <label>Screenshot (optional)</label>
-              <input id="imageInput" type="file" accept="image/png,image/jpeg,image/webp" />
-            </div>
-            <div class="compose-row">
-              <textarea id="messageInput" placeholder="Type post context and generate one reply..."></textarea>
-              <button id="sendBtn" class="btn" style="width: 160px;">Generate Reply</button>
-            </div>
+
+          <section id="messages" class="messages">
+            <div class="thread" id="thread"></div>
           </section>
+
+          <div class="composer-wrap">
+            <div class="composer">
+              <div id="agentStatus" class="agent-status"></div>
+              <div id="attachmentChip" class="attachment-chip">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21.4 11.6 12 21a5.7 5.7 0 0 1-8-8l9.5-9.5a4 4 0 0 1 5.6 5.6L9.7 18.5a2.1 2.1 0 0 1-3-3L15 7.3"/></svg>
+                <span id="attachmentName">Image attached</span>
+                <button id="clearAttachment" type="button" aria-label="Remove attachment">×</button>
+              </div>
+              <textarea id="messageInput" placeholder="Reply..." rows="1"></textarea>
+              <input id="imageInput" type="file" accept="image/png,image/jpeg,image/webp" style="display:none" />
+              <div class="composer-bar">
+                <div class="composer-left">
+                  <button id="attachBtn" class="round-btn" type="button" aria-label="Attach screenshot">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"/></svg>
+                  </button>
+                </div>
+                <div class="composer-right">
+                  <button id="sendBtn" class="round-btn primary" type="button" aria-label="Send">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19V5"/><path d="m5 12 7-7 7 7"/></svg>
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="footer-note">CommentGen is AI and can make mistakes. Please double-check responses.</div>
         </section>
       </main>
     </div>
@@ -265,11 +790,16 @@
       const homeOpenChatBtn = document.getElementById("homeOpenChatBtn");
       const homeClearBtn = document.getElementById("homeClearBtn");
       const messagesEl = document.getElementById("messages");
+      const threadEl = document.getElementById("thread");
       const titleEl = document.getElementById("sessionTitle");
       const inputEl = document.getElementById("messageInput");
       const sendBtn = document.getElementById("sendBtn");
       const newSessionBtn = document.getElementById("newSession");
       const imageInputEl = document.getElementById("imageInput");
+      const attachBtn = document.getElementById("attachBtn");
+      const attachmentChip = document.getElementById("attachmentChip");
+      const attachmentName = document.getElementById("attachmentName");
+      const clearAttachment = document.getElementById("clearAttachment");
       const agentStatusEl = document.getElementById("agentStatus");
 
       let currentSessionId = null;
@@ -293,19 +823,95 @@
         return res.json();
       }
 
-      function renderMessage(msg) {
-        const wrap = createBubble(msg.role, msg.content);
-        const meta = document.createElement("small");
-        meta.textContent = new Date(msg.created_at).toLocaleString();
-        wrap.appendChild(meta);
-        messagesEl.appendChild(wrap);
+      function autosize(el) {
+        el.style.height = "auto";
+        el.style.height = Math.min(el.scrollHeight, 240) + "px";
       }
 
-      function createBubble(role, content) {
+      function renderMessage(msg) {
         const wrap = document.createElement("div");
-        wrap.className = `bubble ${role}`;
-        wrap.textContent = content;
-        return wrap;
+        wrap.className = `msg ${msg.role}`;
+        const bubble = document.createElement("div");
+        bubble.className = "bubble";
+        bubble.textContent = msg.content;
+        wrap.appendChild(bubble);
+
+        const actions = document.createElement("div");
+        actions.className = "msg-actions";
+        actions.innerHTML = `
+          <button class="icon-btn" type="button" aria-label="Copy">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h10"/></svg>
+          </button>
+          <button class="icon-btn" type="button" aria-label="Good">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M7 22V11"/><path d="M2 13v7a2 2 0 0 0 2 2h14.8a2 2 0 0 0 2-1.7l1.2-7a2 2 0 0 0-2-2.3H15l1-4.5a2 2 0 0 0-2-2.5L9 11"/></svg>
+          </button>
+          <button class="icon-btn" type="button" aria-label="Bad">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M17 2v11"/><path d="M22 11V4a2 2 0 0 0-2-2H5.2a2 2 0 0 0-2 1.7L2 11a2 2 0 0 0 2 2.3H9l-1 4.5a2 2 0 0 0 2 2.5L15 13"/></svg>
+          </button>
+          <button class="icon-btn" type="button" aria-label="Regenerate">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 1-3.1-6.8"/><path d="M21 4v5h-5"/></svg>
+          </button>
+        `;
+        wrap.appendChild(actions);
+        threadEl.appendChild(wrap);
+        return bubble;
+      }
+
+      function appendLiveAssistantBubble() {
+        const wrap = document.createElement("div");
+        wrap.className = "msg assistant";
+        const bubble = document.createElement("div");
+        bubble.className = "bubble";
+        bubble.textContent = "";
+        wrap.appendChild(bubble);
+        threadEl.appendChild(wrap);
+        return bubble;
+      }
+
+      function appendAgentFlow() {
+        const wrap = document.createElement("div");
+        wrap.className = "msg assistant";
+        const flow = document.createElement("div");
+        flow.className = "agent-flow";
+        flow.innerHTML = `
+          <div class="agent-flow-head"><span class="dot"></span>Agentic flow</div>
+        `;
+        wrap.appendChild(flow);
+        threadEl.appendChild(wrap);
+        return flow;
+      }
+
+      function addFlowStep(flow, agentName, message) {
+        const steps = flow.querySelectorAll(".agent-step");
+        if (steps.length) {
+          const prev = steps[steps.length - 1];
+          if (prev.getAttribute("data-state") === "running") {
+            prev.setAttribute("data-state", "done");
+          }
+        }
+        const step = document.createElement("div");
+        step.className = "agent-step";
+        step.setAttribute("data-state", "running");
+        step.setAttribute("data-agent", agentName);
+        step.innerHTML = `
+          <span class="state" aria-hidden="true"></span>
+          <span class="label">
+            <span class="tag">agent</span>
+            <span class="name">${escapeHtml(agentName)}</span>
+            <span class="msg-text">${escapeHtml(message || "")}</span>
+          </span>
+        `;
+        flow.appendChild(step);
+        return step;
+      }
+
+      function finalizeFlow(flow, state) {
+        const steps = flow.querySelectorAll(".agent-step");
+        if (!steps.length) return;
+        const last = steps[steps.length - 1];
+        if (last.getAttribute("data-state") === "running") {
+          last.setAttribute("data-state", state || "done");
+        }
       }
 
       async function loadSessions() {
@@ -314,10 +920,9 @@
         for (const s of sessions) {
           const item = document.createElement("div");
           item.className = "session-item" + (s.session_id === currentSessionId ? " active" : "");
-          item.innerHTML = `
-            <div class="session-title">${s.title}</div>
-            <div class="session-time">${new Date(s.updated_at).toLocaleString()}</div>
-          `;
+          item.setAttribute("role", "listitem");
+          item.innerHTML = `<div class="session-title">${escapeHtml(s.title || "Untitled")}</div>`;
+          item.title = s.title || "";
           item.onclick = async () => {
             currentSessionId = s.session_id;
             await loadSession(currentSessionId);
@@ -327,11 +932,20 @@
         }
       }
 
+      function escapeHtml(s) {
+        return String(s)
+          .replaceAll("&", "&amp;")
+          .replaceAll("<", "&lt;")
+          .replaceAll(">", "&gt;")
+          .replaceAll('"', "&quot;")
+          .replaceAll("'", "&#039;");
+      }
+
       async function loadSession(sessionId) {
         const data = await api(`/api/sessions/${sessionId}`);
         showView("chat");
-        titleEl.textContent = data.title;
-        messagesEl.innerHTML = "";
+        titleEl.textContent = data.title || "New chat";
+        threadEl.innerHTML = "";
         for (const msg of data.messages) renderMessage(msg);
         messagesEl.scrollTop = messagesEl.scrollHeight;
       }
@@ -354,11 +968,13 @@
         messagesEl.scrollTop = messagesEl.scrollHeight;
 
         inputEl.value = "";
+        autosize(inputEl);
         imageInputEl.value = "";
+        attachmentChip.classList.remove("visible");
 
         sendBtn.disabled = true;
         agentStatusEl.classList.remove("error");
-        agentStatusEl.textContent = "Running agent: preparing request...";
+        agentStatusEl.textContent = "Thinking...";
         try {
           const imageDataUrl = file ? await fileToDataUrl(file) : null;
           const payload = { message, image_data_url: imageDataUrl };
@@ -371,8 +987,8 @@
             throw new Error(await parseApiError(streamRes));
           }
 
-          const liveBubble = createBubble("assistant", "");
-          messagesEl.appendChild(liveBubble);
+          const flow = appendAgentFlow();
+          const liveBubble = appendLiveAssistantBubble();
           messagesEl.scrollTop = messagesEl.scrollHeight;
 
           const reader = streamRes.body.getReader();
@@ -399,13 +1015,17 @@
               const data = JSON.parse(dataText);
 
               if (eventName === "status") {
-                agentStatusEl.textContent = `Running agent: ${data.agent}`;
+                addFlowStep(flow, data.agent || "agent", data.message || "");
+                agentStatusEl.textContent = `agent · ${data.agent || ""}`;
+                messagesEl.scrollTop = messagesEl.scrollHeight;
               } else if (eventName === "chunk") {
                 liveBubble.textContent = data.text || "";
                 messagesEl.scrollTop = messagesEl.scrollHeight;
               } else if (eventName === "done") {
                 donePayload = data;
+                finalizeFlow(flow, "done");
               } else if (eventName === "error") {
+                finalizeFlow(flow, "error");
                 throw new Error(data.message || "Streaming error");
               }
             }
@@ -422,9 +1042,6 @@
           agentStatusEl.textContent = msg;
         } finally {
           sendBtn.disabled = false;
-          if (agentStatusEl.textContent.startsWith("Running agent:")) {
-            agentStatusEl.textContent = "";
-          }
         }
       }
 
@@ -456,31 +1073,86 @@
         return raw || `HTTP ${response.status}`;
       }
 
+      // --- Wiring ---
+      function goHome() {
+        currentSessionId = null;
+        titleEl.textContent = "New chat";
+        threadEl.innerHTML = "";
+        inputEl.value = "";
+        autosize(inputEl);
+        imageInputEl.value = "";
+        attachmentChip.classList.remove("visible");
+        agentStatusEl.textContent = "";
+        agentStatusEl.classList.remove("error");
+        homePromptEl.focus();
+        showView("home");
+        loadSessions();
+      }
+
+      async function startSessionFromHome() {
+        const prompt = homePromptEl.value.trim();
+        if (!prompt) {
+          homePromptEl.focus();
+          return;
+        }
+        homePromptEl.value = "";
+        autosize(homePromptEl);
+
+        const data = await api("/api/sessions", {
+          method: "POST",
+          body: JSON.stringify({ first_message: "" }),
+        });
+        currentSessionId = data.session_id;
+        showView("chat");
+        titleEl.textContent = "New chat";
+        threadEl.innerHTML = "";
+        inputEl.value = prompt;
+        autosize(inputEl);
+        await loadSessions();
+        await sendIterate();
+      }
+
       sendBtn.onclick = sendIterate;
-      newSessionBtn.onclick = createSession;
-      homeBtn.onclick = () => showView("home");
+      newSessionBtn.onclick = goHome;
+      homeBtn.onclick = goHome;
       brandHomeLink.onclick = (e) => {
         e.preventDefault();
-        showView("home");
+        goHome();
       };
       homeClearBtn.onclick = () => {
         homePromptEl.value = "";
+        autosize(homePromptEl);
+        homePromptEl.focus();
       };
-      homeOpenChatBtn.onclick = async () => {
-        const prompt = homePromptEl.value.trim();
-        if (!currentSessionId) {
-          await createSession();
+      homeOpenChatBtn.onclick = startSessionFromHome;
+      attachBtn.onclick = () => imageInputEl.click();
+      imageInputEl.addEventListener("change", () => {
+        const f = imageInputEl.files[0];
+        if (f) {
+          attachmentName.textContent = f.name;
+          attachmentChip.classList.add("visible");
         } else {
-          showView("chat");
+          attachmentChip.classList.remove("visible");
         }
-        inputEl.value = prompt;
-        inputEl.focus();
+      });
+      clearAttachment.onclick = () => {
+        imageInputEl.value = "";
+        attachmentChip.classList.remove("visible");
       };
+
+      inputEl.addEventListener("input", () => autosize(inputEl));
+      homePromptEl.addEventListener("input", () => autosize(homePromptEl));
 
       inputEl.addEventListener("keydown", (e) => {
         if (e.key === "Enter" && !e.shiftKey) {
           e.preventDefault();
           sendIterate();
+        }
+      });
+      homePromptEl.addEventListener("keydown", (e) => {
+        if (e.key === "Enter" && !e.shiftKey) {
+          e.preventDefault();
+          startSessionFromHome();
         }
       });
 
@@ -497,6 +1169,8 @@
           await createSession();
         }
         await loadSessions();
+        autosize(inputEl);
+        autosize(homePromptEl);
       })();
     </script>
   </body>
