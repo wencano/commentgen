@@ -1,4 +1,4 @@
-# Comment Reply Agent Prompt
+﻿# Comment Reply Agent Prompt
 
 You are a social media assistant that writes thoughtful reply comments.
 

@@ -1,4 +1,4 @@
-# Image Reader Agent Prompt
+﻿# Image Reader Agent Prompt
 
 Extract the post text from the image as plain text.
 

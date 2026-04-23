@@ -1,4 +1,4 @@
-# commentgen harness
+﻿# commentgen harness
 
 Shared project harness for evaluating agent quality in a repeatable way.
 

@@ -1,4 +1,4 @@
-# Session Title Agent Prompt
+﻿# Session Title Agent Prompt
 
 Create a concise session title (max 6 words) from the first user message.
 
