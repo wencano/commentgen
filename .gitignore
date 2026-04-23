@@ -8,3 +8,4 @@ runs/*.json
 harness/report/*.json
 commentgen.db
 /commentgen.db
+rsync.sh
