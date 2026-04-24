@@ -1,5 +1,12 @@
 from pathlib import Path
 import asyncio
+
+from agents.guardrails import (
+    clip_for_session_title_seed,
+    contains_strict_disallowed,
+    looks_like_injection_attack,
+    sanitize_title_text,
+)
 from app.llm_client import LLMClient
 
 
@@ -13,18 +20,20 @@ class SessionTitleAgent:
         return prompt_path.read_text()
 
     async def generate_title(self, message: str) -> str:
-        message = (message or "").strip()
+        message = clip_for_session_title_seed((message or "").strip())
         if not message:
+            return "New chat"
+        if contains_strict_disallowed(message) or looks_like_injection_attack(message):
             return "New chat"
         # Fall back locally so session creation never blocks on provider availability.
         if not self.llm.is_configured():
             await asyncio.sleep(0.25)
-            return self._fallback_title(message)
+            return sanitize_title_text(self._fallback_title(message))
 
         title = await self._generate_with_llm(message)
         if not title:
             await asyncio.sleep(0.15)
-        return title or self._fallback_title(message)
+        return sanitize_title_text(title or self._fallback_title(message))
 
     async def _generate_with_llm(self, message: str) -> str:
         prompt = (
@@ -33,9 +42,9 @@ class SessionTitleAgent:
             f"{message}\n"
         )
         text = await self.llm.generate_text(prompt=prompt, temperature=0.2, top_p=0.95)
-        # Normalize whitespace and cap length to keep sidebar titles compact.
+        # Normalize whitespace; length cap is enforced in sanitize_title_text.
         clean = " ".join(text.strip().split())
-        return clean[:80]
+        return clean[:200]
 
     def _fallback_title(self, message: str) -> str:
         words = [w.strip(".,!?;:") for w in message.split() if w.strip(".,!?;:")]

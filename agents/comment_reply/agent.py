@@ -1,8 +1,15 @@
 import json
 import asyncio
 from pathlib import Path
-from typing import List, Tuple
+from typing import List, Optional, Tuple
 
+from agents.guardrails import (
+    clip_source_for_comment,
+    contains_strict_disallowed,
+    looks_like_injection_attack,
+    sanitize_comment_text,
+    REFUSAL_COMMENT,
+)
 from app.llm_client import LLMClient
 from app.schemas import CommentRunRequest
 
@@ -14,22 +21,38 @@ class CommentReplyAgent:
         self.llm = llm_client
         self.prompt_template = self._load_prompt_template()
 
+    def _apply_input_guardrails(self, req: CommentRunRequest) -> Optional[CommentRunRequest]:
+        clipped = clip_source_for_comment(req.source_post_text)
+        if contains_strict_disallowed(clipped) or looks_like_injection_attack(clipped):
+            return None
+        if clipped != req.source_post_text:
+            return req.model_copy(update={"source_post_text": clipped})
+        return req
+
     async def generate(self, req: CommentRunRequest) -> Tuple[List[str], str, str]:
+        gated = self._apply_input_guardrails(req)
+        if gated is None:
+            n = max(1, req.variants)
+            return [REFUSAL_COMMENT] * n, "guardrails", "policy"
+        return await self._generate_inner(gated)
+
+    async def _generate_inner(self, req: CommentRunRequest) -> Tuple[List[str], str, str]:
         # Keep the app usable offline or without provider keys.
         if not self.llm.is_configured():
             await asyncio.sleep(1.0)
-            return self._fallback(req), "local-fallback", "deterministic-template"
+            return self._maybe_sanitize(self._fallback(req)), "local-fallback", "deterministic-template"
 
         comments = await self._generate_with_llm(req)
         if comments:
-            return (
-                comments[: req.variants],
-                self.llm.active_provider_label(),
-                self.llm.active_model(),
-            )
+            out = [sanitize_comment_text(c) for c in comments[: req.variants]]
+            return (out, self.llm.active_provider_label(), self.llm.active_model())
         # Simulate graceful degradation when provider returns unusable output.
         await asyncio.sleep(0.6)
-        return self._fallback(req), "local-fallback", "deterministic-template"
+        return self._maybe_sanitize(self._fallback(req)), "local-fallback", "deterministic-template"
+
+    @staticmethod
+    def _maybe_sanitize(comments: List[str]) -> List[str]:
+        return [sanitize_comment_text(c) for c in comments]
 
     def _load_prompt_template(self) -> str:
         prompt_path = Path(__file__).resolve().parent / "prompt.md"

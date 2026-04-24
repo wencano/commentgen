@@ -1,6 +1,10 @@
 from pathlib import Path
 import asyncio
 
+from agents.guardrails import (
+    clip_extracted_image_text,
+    contains_strict_disallowed,
+)
 from app.llm_client import LLMClient
 
 
@@ -30,5 +34,8 @@ class ImageReaderAgent:
         )
         if not text:
             await asyncio.sleep(0.25)
-        # Store compact plain text for downstream prompt composition.
-        return " ".join(text.strip().split())
+        t = " ".join(text.strip().split())
+        t = clip_extracted_image_text(t)
+        if contains_strict_disallowed(t):
+            return ""
+        return t
