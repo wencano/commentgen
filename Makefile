@@ -1,4 +1,4 @@
-.PHONY: dev setup
+.PHONY: dev setup test
 
 PORT ?= 8010
 HOST ?= 127.0.0.1
@@ -14,3 +14,6 @@ setup:
 
 dev:
 	$(PYTHON) -m uvicorn app.main:app --reload --host $(HOST) --port $(PORT)
+
+test:
+	$(PYTHON) -m unittest discover -s tests -v
