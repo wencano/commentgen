@@ -1,0 +1,23 @@
+# One substring per line (matched case-insensitively). Lines starting with # are ignored.
+# Tighten or expand this file per deployment; quoted material in a source post can still match.
+
+child porn
+childporn
+child pornography
+csam
+rape her
+rape him
+how to make a bomb
+how to build a bomb
+bomb making instructions
+how to make explosives
+synthesize sarin
+how to make meth
+ricin recipe
+how to get away with murder
+dox the
+doxx the
+swat the
+post their ssn
+post their address
+go kill yourself

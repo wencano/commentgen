@@ -1,0 +1,4 @@
+# One full Python regex per line. Case-insensitive and DOTALL. Lines starting with # are ignored.
+# Use for word boundaries or patterns that are too error-prone as plain substrings.
+
+\bkys\b

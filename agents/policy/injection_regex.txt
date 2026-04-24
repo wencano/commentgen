@@ -1,0 +1,5 @@
+# Matched only on relatively short user text (heuristic: prompt-injection, not a real post). Case-insensitive, DOTALL.
+
+ignore (all|previous) (instructions|system)
+you are now (DAN|uncensored|jailbreak)
+system:?\s*override
