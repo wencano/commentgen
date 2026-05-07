@@ -4,25 +4,42 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>CommentGen Home</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap"
+      rel="stylesheet"
+    />
     <style>
       :root {
         color-scheme: dark;
-        --bg: #141414;
-        --panel: #1f1f1f;
-        --text: #e8e8e8;
-        --muted: #a0a0a0;
-        --accent: #6da3ff;
+        --bg: #171717;
+        --panel: #1c1c1c;
+        --border: #2a2a2a;
+        --border-strong: #333333;
+        --text: #ededed;
+        --muted: #737373;
+        --text-soft: #a3a3a3;
+        --accent: #3ecf8e;
+        --accent-ring: rgba(62, 207, 142, 0.35);
+        --font-ui: "Inter", ui-sans-serif, system-ui, -apple-system, sans-serif;
+      }
+      * {
+        box-sizing: border-box;
       }
       body {
         margin: 0;
-        font-family: Inter, ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial;
+        font-family: var(--font-ui);
+        font-size: 13px;
         background: var(--bg);
         color: var(--text);
+        letter-spacing: -0.01em;
+        -webkit-font-smoothing: antialiased;
       }
       .wrap {
-        max-width: 920px;
+        max-width: 720px;
         margin: 0 auto;
-        padding: 40px 20px 60px;
+        padding: 48px 24px 80px;
       }
       .logo {
         display: inline-flex;
@@ -30,90 +47,132 @@
         gap: 10px;
         color: var(--text);
         text-decoration: none;
-        margin-bottom: 24px;
+        margin-bottom: 32px;
       }
       .logo-mark {
-        width: 30px;
-        height: 30px;
-        border-radius: 8px;
-        background: linear-gradient(135deg, #6da3ff, #83e3ff);
+        width: 28px;
+        height: 28px;
+        border-radius: 6px;
+        background: linear-gradient(145deg, #3ecf8e 0%, #2eb878 100%);
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        color: #0d0d0d;
       }
       .logo span {
-        font-weight: 700;
-        letter-spacing: 0.2px;
+        font-weight: 600;
+        font-size: 14px;
+        letter-spacing: -0.02em;
       }
       h1 {
-        margin: 0 0 8px;
-        font-size: 34px;
+        margin: 0 0 10px;
+        font-size: 26px;
+        font-weight: 600;
+        letter-spacing: -0.03em;
       }
-      p {
-        margin: 0 0 24px;
-        color: var(--muted);
-        line-height: 1.5;
+      .lead {
+        margin: 0 0 28px;
+        color: var(--text-soft);
+        line-height: 1.6;
+        font-size: 14px;
       }
       .card {
         background: var(--panel);
-        border: 1px solid #333;
-        border-radius: 12px;
+        border: 1px solid var(--border);
+        border-radius: 8px;
         padding: 16px;
       }
       label {
         display: block;
-        font-size: 13px;
+        font-size: 11px;
+        font-weight: 500;
         color: var(--muted);
-        margin-bottom: 8px;
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+        margin-bottom: 10px;
       }
       textarea {
         width: 100%;
-        min-height: 220px;
+        min-height: 200px;
         resize: vertical;
-        border-radius: 10px;
-        border: 1px solid #3d3d3d;
-        background: #1a1a1a;
+        border-radius: 6px;
+        border: 1px solid var(--border-strong);
+        background: #141414;
         color: var(--text);
         padding: 12px;
-        box-sizing: border-box;
+        font-family: inherit;
+        font-size: 14px;
+        line-height: 1.5;
+      }
+      textarea:focus {
+        outline: none;
+        border-color: var(--accent);
+        box-shadow: 0 0 0 2px var(--accent-ring);
+      }
+      textarea::placeholder {
+        color: var(--muted);
       }
       .actions {
         display: flex;
+        flex-wrap: wrap;
         gap: 10px;
-        margin-top: 12px;
+        margin-top: 14px;
       }
-      button, a.btn {
-        border: 1px solid #3d3d3d;
-        background: #252525;
-        color: var(--text);
-        border-radius: 8px;
-        padding: 10px 14px;
+      button,
+      a.btn {
+        border: 1px solid var(--border-strong);
+        background: transparent;
+        color: var(--text-soft);
+        border-radius: 6px;
+        padding: 8px 14px;
         cursor: pointer;
         text-decoration: none;
-        display: inline-block;
+        display: inline-flex;
+        align-items: center;
+        font-family: inherit;
+        font-size: 12px;
+        font-weight: 500;
+      }
+      button:hover,
+      a.btn:hover {
+        background: #1f1f1f;
+        color: var(--text);
       }
       .primary {
-        background: #2f4f86;
-        border-color: #4c6ba3;
+        background: var(--accent);
+        border-color: var(--accent);
+        color: #101010;
+      }
+      .primary:hover {
+        background: #47e8a0;
+        border-color: #47e8a0;
+        color: #101010;
       }
     </style>
   </head>
   <body>
     <div class="wrap">
       <a class="logo" href="/chat" title="Open CommentGen chat">
-        <div class="logo-mark"></div>
+        <span class="logo-mark" aria-hidden="true">
+          <svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor">
+            <path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2z" />
+          </svg>
+        </span>
         <span>CommentGen</span>
       </a>
 
       <h1>Agentic comment generation</h1>
-      <p>
+      <p class="lead">
         Create one clear social-media reply from your text prompt or screenshot context.
         Start with a detailed prompt below, then open chat to generate and iterate quickly.
       </p>
 
       <div class="card">
-        <label for="prompt">Big prompt</label>
+        <label for="prompt">Prompt</label>
         <textarea id="prompt" placeholder="Describe the post context, audience, and desired reply angle..."></textarea>
         <div class="actions">
-          <button id="openChat" class="primary">Open Chat With Prompt</button>
-          <a class="btn" href="/chat">Open Empty Chat</a>
+          <button id="openChat" class="primary" type="button">Open chat with prompt</button>
+          <a class="btn" href="/chat">Open empty chat</a>
         </div>
       </div>
     </div>
@@ -129,4 +188,4 @@
       });
     </script>
   </body>
-  </html>
+</html>
